@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>弦外 · 专业音乐定制</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background:#08080d; color:#e8e8e8;
+  font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei",serif;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 15%, rgba(201,168,76,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 75%, rgba(201,168,76,0.03) 0%, transparent 50%);
+}
+.wrap { max-width:340px; margin:0 auto; padding:0 12px; }
+
+/* ====== 封面 ====== */
+.cover { text-align:center; min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; position:relative; padding:40px 0; }
+.cover-content { position:relative; z-index:1; display:inline-block; }
+.cover-content::before {
+  content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:180px; height:180px; border-radius:50%;
+  border:1px solid rgba(201,168,76,0.06); pointer-events:none;
+}
+.cover-content::after {
+  content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:300px; height:300px; border-radius:50%;
+  border:2px solid rgba(201,168,76,0.12); pointer-events:none;
+  -webkit-mask:linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 10%, black 22%, black 100%);
+  mask:linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 10%, black 22%, black 100%);
+}
+.cover-brand { font-size:10px; font-weight:400; letter-spacing:9px; color:#c9a84c; margin-bottom:30px; opacity:0.7; }
+.cover-title {
+  font-size:50px; font-weight:200; letter-spacing:20px; line-height:1; margin-bottom:12px; padding-left:10px;
+  background:linear-gradient(160deg,#f5edd8 0%,#c9a84c 40%,#a68b3a 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.cover-sub { font-size:10px; font-weight:400; letter-spacing:8px; color:#888; margin-bottom:20px; }
+.cover-line { width:40px; height:1px; background:linear-gradient(90deg,transparent,#c9a84c,transparent); margin:0 auto 24px; }
+.cover-slogan { font-size:13px; font-weight:300; color:#999; }
+.cover-wave {
+  position:absolute; bottom:0; left:0; right:0; height:60px;
+  display:flex; align-items:flex-end; justify-content:center; gap:3px; opacity:0.1; pointer-events:none;
+}
+.cover-wave i { display:block; width:3px; background:linear-gradient(to top,#c9a84c,transparent); border-radius:3px; animation:wb 1.8s ease-in-out infinite; }
+@keyframes wb { 0%,100%{height:10px;opacity:0.3} 50%{height:42px;opacity:0.7} }
+.scroll-hint { position:absolute; bottom:16px; font-size:10px; color:#666; letter-spacing:3px; animation:bounce 1.8s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0);opacity:0.4} 50%{transform:translateY(6px);opacity:1} }
+
+/* ====== 歌曲页 ====== */
+.song-page { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:40px 20px; position:relative; }
+.song-page.playing { justify-content:flex-start; padding-top:40px; }
+.song-body { width:100%; max-width:340px; text-align:center; position:relative; z-index:2; }
+.song-page.playing .song-body { margin-bottom:20px; transition:all 0.8s cubic-bezier(0.22,0,0.2,1); }
+.song-body { transition:all 0.8s cubic-bezier(0.22,0,0.2,1); }
+.song-page.playing .song-num { font-size:36px; opacity:0.15; margin-bottom:2px; }
+.song-page.playing .song-title { font-size:20px; margin-bottom:2px; }
+.song-page.playing .song-tag { font-size:11px; margin-bottom:0; }
+.song-page.playing .song-desc { display:none; }
+.song-page.playing .song-play-btn { width:40px; height:40px; font-size:16px; }
+
+.song-num, .song-title, .song-tag, .song-play-btn { transition:all 0.8s cubic-bezier(0.22,0,0.2,1); }
+.song-num { font-size:72px; font-weight:100; color:#c9a84c; opacity:0.25; line-height:1; margin-bottom:8px; }
+.song-title { font-size:28px; font-weight:300; margin-bottom:6px; letter-spacing:3px; }
+.song-tag { font-size:13px; color:#c9a84c; letter-spacing:2px; margin-bottom:32px; }
+.song-desc { font-size:15px; color:#a0a0a0; line-height:1.8; font-weight:300; margin-bottom:28px; }
+.song-play-btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:56px; height:56px; border-radius:50%;
+  background:linear-gradient(135deg,#c9a84c,#a68b3a);
+  border:none; font-size:22px; color:#08080d; cursor:pointer;
+  box-shadow:0 4px 20px rgba(201,168,76,0.2);
+}
+.song-play-btn:active { transform:scale(0.93); }
+
+/* ====== 歌词区 ====== */
+.lyric-area { max-height:0; overflow:hidden; opacity:0; width:100%; max-width:340px; text-align:center; position:relative; z-index:2; transition:all 0.7s cubic-bezier(0.22,0,0.2,1); }
+.song-page.playing .lyric-area { max-height:50vh; opacity:1; overflow-y:auto; }
+.lyric-area::-webkit-scrollbar { width:3px; }
+.lyric-area::-webkit-scrollbar-track { background:transparent; }
+.lyric-area::-webkit-scrollbar-thumb { background:rgba(201,168,76,0.2); border-radius:2px; }
+.lyric-line {
+  font-size:15px; font-weight:300; color:#777; letter-spacing:2px;
+  text-align:center; margin:5px 0; line-height:1.4; padding:0 6px;
+  transition:all 0.6s cubic-bezier(0.22,0,0.2,1);
+}
+.lyric-line.active { color:#ebd8a0; font-size:18px; font-weight:400; }
+.lyric-line.prev { color:#666; font-size:14px; }
+
+/* ====== 通用内页 ====== */
+.sec { padding:50px 0; }
+.tag { font-size:9px; letter-spacing:7px; color:#c9a84c; margin-bottom:10px; }
+.tag::after { content:''; display:block; width:20px; height:1px; background:#c9a84c; margin-top:10px; opacity:0.35; }
+.sec-title { font-size:26px; font-weight:300; margin-bottom:28px; letter-spacing:3px; }
+.hr { height:1px; background:rgba(255,255,255,0.04); }
+
+.about-block { margin-bottom:28px; }
+.about-block h3 { font-size:15px; font-weight:400; color:#e8d5a3; margin-bottom:10px; letter-spacing:2px; }
+.about-block p { font-size:13px; color:#a0a0a0; line-height:1.8; font-weight:300; }
+.about-quote { text-align:center; font-size:12px; font-style:italic; color:#e8d5a3; opacity:0.7; margin-top:24px; letter-spacing:2px; }
+.about-quote::before { content:''; display:block; width:18px; height:1px; background:rgba(201,168,76,0.2); margin:0 auto 10px; }
+
+.vcard {
+  background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.06);
+  border-radius:16px; padding:22px; margin-bottom:12px;
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  transition:all 0.35s cubic-bezier(0.22,0,0.2,1);
+}
+.vcard:active { border-color:rgba(201,168,76,0.2); transform:scale(0.985); }
+.vcard h3 { font-size:14px; font-weight:400; color:#e8d5a3; margin-bottom:8px; letter-spacing:1px; }
+.vcard p { font-size:13px; color:#999; line-height:1.7; font-weight:300; }
+
+/* ====== 联系 ====== */
+.contact-section { text-align:center; padding:60px 0 40px; }
+.contact-section p { font-size:14px; color:#a0a0a0; margin-bottom:22px; line-height:1.9; font-weight:300; }
+.contact-section img { width:140px; height:140px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); display:block; margin:0 auto 14px; }
+.contact-hint { font-size:11px; color:#666; letter-spacing:4px; }
+.foot { text-align:center; font-size:10px; color:#444; letter-spacing:5px; padding:20px 0 50px; }
+
+/* ====== 底部播放条 ====== */
+.pbar {
+  position:fixed; bottom:0; left:0; right:0; z-index:100;
+  background:rgba(8,8,13,0.92); backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-top:1px solid rgba(255,255,255,0.05); padding:10px 16px; display:none;
+}
+.pbar-inner { max-width:340px; margin:0 auto; display:flex; align-items:center; gap:12px; }
+.pbar-name { font-size:12px; color:#999; flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.pbar-btn { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#c9a84c,#a68b3a); border:none; font-size:14px; color:#08080d; flex-shrink:0; cursor:pointer; }
+.pbar-track { flex:2; height:2px; background:rgba(255,255,255,0.08); border-radius:1px; cursor:pointer; }
+.pbar-fill { height:100%; background:#c9a84c; border-radius:1px; width:0%; }
+</style>
+</head>
+<body>
+
+
+
+<!-- ====== 封面 ====== -->
+<section class="cover">
+  <div class="cover-content">
+    <p class="cover-brand">XIAN WAI MUSIC</p>
+    <h1 class="cover-title">弦 外</h1>
+    <p class="cover-sub">专业音乐定制工作室</p>
+    <div class="cover-line"></div>
+    <p class="cover-slogan">让每一份心意，都有弦外之音</p>
+  </div>
+  <div class="cover-wave" id="coverWave"></div>
+  <p class="scroll-hint">↓ 向下滑动</p>
+</section>
+
+<div class="hr"></div>
+<!-- ====== 关于弦外 ====== -->
+<section class="sec">
+  <div class="wrap">
+    <p class="tag">ABOUT</p>
+    <h2 class="sec-title">关于弦外</h2>
+    <div class="about-block">
+      <h3>我们的能力</h3>
+      <p>核心团队来自星海音乐学院、四川音乐学院、广西艺术学院硕士、岭南师范学院音乐系等专业音乐院校。将学院派的创作能力与前沿 AI 技术深度结合。</p>
+    </div>
+    <div class="about-block">
+      <h3>核心理念</h3>
+      <p>让每一段故事都能被谱写成独一无二的旋律。音乐是情感的载体，每一首歌都应该有它专属的温度与记忆。</p>
+      <p class="about-quote">—— 弦外之音，是你想说却没说出口的话</p>
+    </div>
+  </div>
+</section>
+
+<div class="hr"></div>
+
+<!-- ====== 《名为明天》 ====== -->
+<section class="song-page" id="s1">
+  <div class="song-body">
+    <div class="song-num">01</div>
+    <h2 class="song-title">《名为明天》</h2>
+    <p class="song-tag">流行 / 励志 / 大气</p>
+    <p class="song-desc">塞尔维亚总统武契奇在清华大学的一场演讲深深触动了我们。将这份观后感谱写成歌，献给每一个相信明天的人。</p>
+    <button class="song-play-btn" data-song="0">▶</button>
+  </div>
+  <div class="lyric-area" id="lyric1"></div>
+  <p class="scroll-hint">↓ 向下滑动</p>
+</section>
+
+<!-- ====== 《永远的你们》 ====== -->
+<section class="song-page" id="s2">
+  <div class="song-body">
+    <div class="song-num">02</div>
+    <h2 class="song-title">《永远的你们》</h2>
+    <p class="song-tag">温暖抒情 / 纪念</p>
+    <p class="song-desc">来自一位父亲对三个孩子的爱与期盼——"爸爸妈妈永远爱你们，你们也要爱别人。"让纪念和爱可以反复聆听。</p>
+    <button class="song-play-btn" data-song="1">▶</button>
+  </div>
+  <div class="lyric-area" id="lyric2"></div>
+  <p class="scroll-hint">↓ 向下滑动</p>
+</section>
+
+<!-- ====== 《周满军生日快乐》 ====== -->
+<section class="song-page" id="s3">
+  <div class="song-body">
+    <div class="song-num">03</div>
+    <h2 class="song-title">《周满军生日快乐》</h2>
+    <p class="song-tag">生日定制 / 惊喜礼物</p>
+    <p class="song-desc">一位用户为他父亲 70 岁生日订制的歌曲。从接到需求到交付成品，全程不到 24 小时。</p>
+    <button class="song-play-btn" data-song="2">▶</button>
+  </div>
+  <div class="lyric-area" id="lyric3"></div>
+  <p class="scroll-hint">↓ 向下滑动</p>
+</section>
+
+<div class="hr"></div>
+
+<!-- ====== 定制流程 ====== -->
+<section class="sec">
+  <div class="wrap">
+    <p class="tag">HOW IT WORKS</p>
+    <h2 class="sec-title">定制流程</h2>
+    <div class="vcard"><h3>① 填写需求表</h3><p>告诉我们收歌人是谁、你想表达什么、喜欢什么风格。</p></div>
+    <div class="vcard"><h3>② 确认歌词方向</h3><p>我们根据需求写出歌词初稿，与你确认后进入制作。</p></div>
+    <div class="vcard"><h3>③ 音乐制作</h3><p>专业创作 + AI 技术结合，最快 24 小时内完成。</p></div>
+    <div class="vcard"><h3>④ 交付成品</h3><p>获得您的专属歌曲</p></div>
+  </div>
+</section>
+
+<div class="hr"></div>
+
+<!-- 底部播放条 -->
+<div class="pbar" id="pbar">
+  <div class="pbar-inner">
+    <div class="pbar-name" id="pname">-</div>
+    <div class="pbar-track" id="ptrack"><div class="pbar-fill" id="pfill"></div></div>
+    <button class="pbar-btn" id="pbtn">▶</button>
+  </div>
+</div>
+
+<script>
+// ====== 歌曲数据 ======
+const SONGS = [
+  {
+    name:'《名为明天》', src:'http://tj2l645zd.hn-bkt.clouddn.com/%E5%90%8D%E4%B8%BA%E6%98%8E%E5%A4%A9(2).mp3',
+    lyrics:[
+      {t:31, text:'晨光爬上窗  书包晃过巷'},
+      {t:37, text:'谁在抱怨  今天的早餐不够香'},
+      {t:44, text:'战火那一边  同一轮太阳'},
+      {t:51, text:'照不到废墟下  那一张张脸庞'},
+      {t:59, text:'爷爷的老墙  弹孔还在烫'},
+      {t:65, text:'说着那年  使馆倒塌时的声响'},
+      {t:72, text:'如今长风万里  越过城墙'},
+      {t:78, text:'别忘了世界角落  还有人流浪'},
+      {t:85, text:'你说这太平盛世  理所当然'},
+      {t:91, text:'可曾见那一年  满地的月光'},
+      {t:100, text:'你说这山河无恙  风轻云淡'},
+      {t:107, text:'可曾听那一声  嘶吼绕梁不散'},
+      {t:113, text:'他们用命换来的平常'},
+      {t:117, text:'不是天上掉下的糖'},
+      {t:121, text:'记住这个"理所当然"'},
+      {t:124, text:'是未亡人  最沉的愿望'},
+      {t:132, text:'你厌的周而复始  每日的忙'},
+      {t:138, text:'是多少人求之不得  那一束光'},
+      {t:145, text:'你谈的远方和理想  多么漂亮'},
+      {t:152, text:'先要有脚下不摇  万里疆场'},
+      {t:159, text:'看不见的火种埋在这片土壤'},
+      {t:166, text:'听不见的钟声敲在谁的胸膛'},
+      {t:172, text:'你拥有的今天曾是他们的远方'},
+      {t:181, text:'别让这灯火只照亮了自己脸庞'},
+      {t:196, text:'火种已燃成永不熄灭的焰'},
+      {t:200, text:'我记得那钟声  敲在我胸膛'},
+      {t:209, text:'无论走到何方  回头就有光'},
+      {t:215, text:'你的名字刻在我心上'},
+      {t:221, text:'我愿做一粒微光  汇入你的光芒'},
+      {t:229, text:'让世界看见东方的重量'},
+      {t:235, text:'此生不悔入华夏'},
+      {t:242, text:'中国  是我永远的故乡'},
+      {t:250, text:'明天不是从天而降'},
+      {t:256, text:'是火种埋进土壤开出的光'},
+      {t:265, text:'你听见了吗  那钟声的回响'},
+      {t:273, text:'所谓明天  是他们的守望'},
+    ]
+  },
+  {
+    name:'《永远的你们》', src:'http://tj2l645zd.hn-bkt.clouddn.com/%E6%B0%B8%E8%BF%9C%E7%9A%84%E4%BD%A0%E4%BB%AC5.mp3',
+    lyrics:[
+      {t:20, text:'清菡的笑像阳光  洒进每一天'},
+      {t:26, text:'清岚的梦轻轻飞  带着小小翅膀'},
+      {t:32, text:'承皓的脚步坚定  往前从不退让'},
+      {t:37, text:'三个小小身影  是我们整个世界'},
+      {t:43, text:'时光再怎么走远  我们的心不会变'},
+      {t:48, text:'不管路有多遥远  我们的爱在身边'},
+      {t:53, text:'看着你们每一天  都是最美的画面'},
+      {t:59, text:'这份温暖不会散  陪你们岁岁年年'},
+      {t:64, text:'爸妈永远爱你们  这句话不会过期'},
+      {t:70, text:'无论你走到哪里  身后都有我们的呼吸'},
+      {t:75, text:'我最爱的孩子们  把这份爱装进行囊'},
+      {t:80, text:'也学会去爱别人  世界会因为你们更温柔'},
+      {t:98, text:'长大的路上会有风  也会有彩虹'},
+      {t:104, text:'记得互相牵着手  别让温暖落空'},
+      {t:109, text:'分享快乐和眼泪  拥抱每一个朋友'},
+      {t:115, text:'爱从来不是独占  而是越给越多'},
+      {t:120, text:'爸妈永远爱你们  这句话不会过期'},
+      {t:126, text:'无论你走到哪里  身后都有我们的呼吸'},
+      {t:131, text:'我最爱的孩子们  把这份爱装进行囊'},
+      {t:136, text:'也学会去爱别人  世界会因为你们更温柔'},
+      {t:144, text:'有一天你们也会长大'},
+      {t:147, text:'变成别人的依靠'},
+      {t:150, text:'但请永远记得'},
+      {t:152, text:'家是最初也是最后的港湾'},
+      {t:157, text:'爸妈永远爱你们  直到星星都老去'},
+      {t:167, text:'这是我们最骄傲的名字'},
+      {t:174, text:'带着爱往前走  也把爱留给世界'},
+      {t:185, text:'我们永远爱你们'},
+    ]
+  },
+  {
+    name:'周满军生日快乐', src:'http://tj2l645zd.hn-bkt.clouddn.com/%E7%94%9F%E6%97%A5%E5%BF%AB%E4%B9%903%202.mp3',
+    lyrics:[
+      {t:17, text:'鹿马桥的风  吹过二十春秋'},
+      {t:20, text:'老支书的肩头  扛尽乡里烦忧'},
+      {t:24, text:'话不多性子刚  遇事从不低头'},
+      {t:28, text:'一身硬骨头  藏尽温柔守候'},
+      {t:31, text:'母亲满娥伴左右  冷暖都相守'},
+      {t:39, text:'琐碎春秋默默守好家门口'},
+      {t:46, text:'半生奔走不休  汗水浇熟田畴'},
+      {t:50, text:'难事独自承受  从未轻言愁'},
+      {t:54, text:'您的坚韧风骨  刻在我心头'},
+      {t:57, text:'教我做人坦荡  遇事敢承受'},
+      {t:61, text:'儿女成家立业  儿孙绕在左右'},
+      {t:66, text:'雨涵梓晗读书  岁岁有奔头'},
+      {t:69, text:'今日七十寿  惟愿您安康长久'},
+      {t:72, text:'放下世间操劳  万事别再挂心头'},
+      {t:76, text:'三餐安稳睡无忧  自在度春秋'},
+      {t:80, text:'平安常伴左右  喜乐岁岁留'},
+      {t:84, text:'今日七十寿  惟愿您安康长久'},
+      {t:88, text:'抛开凡尘琐事  随心自在遨游'},
+      {t:91, text:'和母亲相伴相守  岁月皆温柔'},
+      {t:95, text:'身强心宽无愁  快活到白头'},
+      {t:102, text:'明敏携妻利琼  丽芳伴李睿相守'},
+      {t:106, text:'一双孙女勤学  满堂温情长久'},
+      {t:110, text:'不求荣华丰厚  只愿您少烦忧'},
+      {t:114, text:'往后清闲度日  福寿伴您走'},
+      {t:122, text:'愿我父亲周满军'},
+      {t:126, text:'身健无忧  喜乐长久'},
+    ]
+  }
+];
+
+const audio = new Audio();
+let curSong = -1, playing = false;
+
+// 封面波形
+(function(){
+  const w = document.getElementById('coverWave');
+  for(let i=0;i<40;i++){ const s=document.createElement('i'); s.style.height=(8+Math.random()*28)+'px'; s.style.animationDelay=(i*0.08)+'s'; s.style.animationDuration=(1.2+Math.random()*1.2)+'s'; w.appendChild(s); }
+})();
+
+// 预渲染歌词
+SONGS.forEach((song, si) => {
+  const c = document.getElementById('lyric'+(si+1));
+  song.lyrics.forEach(l => {
+    const d = document.createElement('div'); d.className = 'lyric-line'; d.textContent = l.text; c.appendChild(d);
+  });
+});
+
+function renderLyrics(si) {
+  var song = SONGS[si];
+  var lines = document.getElementById('lyric'+(si+1)).children;
+  var t = audio.currentTime;
+  var active = -1;
+  for (var i = song.lyrics.length - 1; i >= 0; i--) { if (t >= song.lyrics[i].t) { active = i; break; } }
+  for (var i = 0; i < lines.length; i++) {
+    lines[i].className = 'lyric-line';
+    if (i === active) { lines[i].classList.add('active'); }
+    else if (i === active - 1) { lines[i].classList.add('prev'); }
+  }
+  // 自动滚动
+  if (active >= 2 && lines[active]) {
+    var container = document.getElementById('lyric'+(si+1));
+    container.scrollTop = lines[active].offsetTop - container.offsetHeight/2;
+  }
+}
+
+// 按钮状态管理
+const btns = document.querySelectorAll('.song-play-btn');
+
+function resetSong(si) {
+  document.getElementById('s'+(si+1)).classList.remove('playing');
+  btns[si].textContent = '▶';
+}
+
+// 播放按钮
+btns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const si = parseInt(btn.dataset.song);
+    // 同一首歌：暂停/播放
+    if (curSong === si) {
+      if (playing) { audio.pause(); } else { audio.play(); }
+      return;
+    }
+    // 切歌
+    if (curSong >= 0) resetSong(curSong);
+    curSong = si;
+    document.getElementById('s'+(si+1)).classList.add('playing');
+    audio.src = SONGS[si].src;
+    audio.load();
+    document.getElementById('pname').textContent = SONGS[si].name;
+    document.getElementById('pbar').style.display = 'block';
+    var promise = audio.play();
+    if (promise !== undefined) {
+      promise.catch(function(e) { console.log('play error:', e); });
+    }
+  });
+});
+
+audio.onplay = function() {
+  playing = true;
+  document.getElementById('pbtn').textContent = '⏸';
+  if (curSong >= 0) btns[curSong].textContent = '⏸';
+};
+audio.onpause = function() {
+  playing = false;
+  document.getElementById('pbtn').textContent = '▶';
+  if (curSong >= 0) btns[curSong].textContent = '▶';
+};
+audio.onended = function() {
+  playing = false;
+  document.getElementById('pbtn').textContent = '▶';
+  if (curSong >= 0) { resetSong(curSong); curSong = -1; }
+};
+audio.ontimeupdate = ()=>{ document.getElementById('pfill').style.width=(audio.currentTime/audio.duration*100||0)+'%'; if(curSong>=0) renderLyrics(curSong); };
+document.getElementById('pbtn').addEventListener('click',()=>{ if(playing)audio.pause(); else audio.play(); });
+document.getElementById('ptrack').addEventListener('click',(e)=>{ audio.currentTime=(e.offsetX/e.target.offsetWidth)*audio.duration; });
+</script>
+</body>
+</html>
+<!-- ====== 封面 ====== -->
+<section class="cover">
+  <div class="cover-content">
+    <p class="cover-brand">XIAN WAI MUSIC</p>
+    <h1 class="cover-title">弦 外</h1>
+    <p class="cover-sub">专业音乐定制工作室</p>
+    <div class="cover-line"></div>
+    <p class="cover-slogan">让每一份心意，都有弦外之音</p>
+  </div>
+  <div class="cover-wave" id="coverWave"></div>
+  <p class="scroll-hint">感谢观看</p>
+</section>
+
+<div class="hr"></div>
+
